@@ -1,6 +1,19 @@
 import { useState, useEffect } from "react";
+import getPosts from "../../utils/getPosts";
 
-function AddPosts({postAddHandle}) {
+function AddPost() {
+  function postAddHandle(event) {
+    event.preventDefault();
+    const title = event.target.elements.title.value;
+    const body = event.target.elements.body.value;
+    const post = {
+      title: title,
+      body: body,
+      id: length + 1,
+    };
+    setData((prevstate) => [...prevstate, post]);
+  }
+
   return (
     <form onSubmit={postAddHandle} className="w-2/5">
       <input
@@ -23,49 +36,47 @@ function AddPosts({postAddHandle}) {
   );
 }
 
-function DisplayPosts({ data }) {
-  return data.map((post,index) => (
-    <div key={index} className="m-2 rounded overflow-hidden shadow-lg">
+function DisplayPost({ title, body, id }) {
+  return (
+    <div className="m-2 rounded overflow-hidden shadow-lg">
       <div className="px-6 py-4">
-        <div className="font-bold text-xl mb-2">{post.title}</div>
-        <p className="text-gray-700 text-base"> {post.body} </p>
+        <div className="font-bold text-xl mb-2">{title}</div>
+        <p className="text-gray-700 text-base"> {body} </p>
       </div>
       <div className="px-6 pt-4 pb-2">
         <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-blue-700 mr-2 mb-2">
-          #{post.id}
+          #{id}
         </span>
       </div>
     </div>
-  ));
+  );
 }
 
 export default function POSTS() {
-  const [data, setData] = useState([{
-    title: "Post1",
-    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam nisi turpis, ultrices in tristique eget, faucibus ut dui. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
-    id: 1,
-  }]);
+  const [data, setData] = useState(null);
 
-  function postAddHandle(event) {
-    event.preventDefault();
-    const title = event.target.elements.title.value;
-    const body = event.target.elements.body.value;
-    const post = {
-      title: title,
-      body: body,
-      id: 2,
-    };
-    const newPosts = data.concat(post);
-    setData(newPosts);
-  }
+  useEffect(() => {
+    getPosts()
+      .then((data) => {
+        setData(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   if (!data) return <p>No POSTS fetched</p>;
   return (
     <div>
       <h1 className="font-bold text-2xl m-2">ADD POSTS</h1>
-      <AddPosts postAddHandle={postAddHandle} />
+      <AddPost length={data.length} setData={setData} />
       <h1 className="font-bold text-2xl m-2">POSTS</h1>;
-      <DisplayPosts data={data} />
+      {data
+        .slice(0)
+        .reverse()
+        .map(({ title, body, id }) => (
+          <DisplayPost key={id} title={title} body={body} id={id} />
+        ))}
     </div>
   );
 }
