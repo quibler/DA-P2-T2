@@ -1,3 +1,8 @@
+Deployed submission for the task
+
+https://da-p2-t2-seven.vercel.app/
+
+
 # Phase 2 - NextJs States
 
 In this task of phase 2, you'll need to fix certain bugs of the NextJS app.
